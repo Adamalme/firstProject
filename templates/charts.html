@@ -1,12 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Spending Charts</title>
+    <meta charset="UTF-8">
+    <title>Spending Overview</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f4f6f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        #chartContainer {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 400px;
+        }
+    </style>
 </head>
-<body class="p-4">
-    <h2>Spending by Category</h2>
-    <canvas id="expenseChart" width="400" height="400"></canvas>
+<body>
+    <div id="chartContainer">
+        <h2>Spending by Category</h2>
+        <canvas id="expenseChart"></canvas>
+    </div>
+
     <script>
         const ctx = document.getElementById('expenseChart').getContext('2d');
         const chart = new Chart(ctx, {
@@ -17,9 +49,34 @@
                     label: 'Expenses',
                     data: {{ totals|tojson }},
                     backgroundColor: [
-                        'red', 'blue', 'green', 'orange', 'purple', 'yellow'
-                    ]
+                        '#FF6384', // Soft red
+                        '#36A2EB', // Blue
+                        '#FFCE56', // Yellow
+                        '#4BC0C0', // Teal
+                        '#9966FF', // Purple
+                        '#FF9F40'  // Orange
+                    ],
+                    borderWidth: 1
                 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Your Expense Breakdown',
+                        font: {
+                            size: 18
+                        }
+                    }
+                }
             }
         });
     </script>
