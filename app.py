@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file
 import sqlite3
 import csv
-from io import StringIO
+from io import StringIO, BytesIO
 from datetime import datetime
 
 app = Flask(__name__)
@@ -78,20 +78,24 @@ def export_csv():
         c.execute("SELECT * FROM transactions")
         transactions = c.fetchall()
 
-    si = StringIO()
-    cw = csv.writer(si)
-    cw.writerow(['ID', 'Date', 'Type', 'Category', 'Amount', 'Description'])
-    cw.writerows(transactions)
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Date', 'Type', 'Category', 'Amount', 'Description'])
+    writer.writerows(transactions)
 
-    output = si.getvalue()
+    # Convert the text to binary for sending
+    mem = BytesIO()
+    mem.write(output.getvalue().encode('utf-8'))
+    mem.seek(0)
+
     return send_file(
-        StringIO(output),
-        mimetype="text/csv",
+        mem,
+        mimetype='text/csv',
         as_attachment=True,
         download_name=f"transactions_{datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
     )
 
 
 if __name__ == "__main__":
+    init_db()
     app.run(debug=True)
-
